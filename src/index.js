@@ -8,19 +8,60 @@ const server = {
   start () {
     const app = express()
 
-    config(app)
+    const bodyParser = require('body-parser')
 
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+)
+
+app.use(bodyParser.json())
+
+    config(app)
+    var mysql = require('mysql');
+    var con = mysql.createConnection({
+      host: "localhost",
+      user: "root",
+      password: "",
+      database: "pruebasnode"
+    });
+    con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
     // Rutas
     app.get('/', (req, res, next) => {
-      res
-        .status(200)
-        .json({ data: 'metodo get' })
+
+      
+      
+   
+        con.query("SELECT * FROM discos", function (err, result, fields) {
+          if (err) throw err;
+          
+          res
+          .status(200)
+          .json( result)
+        });
+     
+
+
+      
+        
     })
 
     app.post('/', (req, res, next) => {
-      res
+      var query = "INSERT INTO `discos`( `nombre`, `artista`, `genero`) VALUES ('"+req.body.name+"','" + req.body.artist+"','" + req.body.genre+"')";
+     
+      con.query(query, function (err, result, fields) {
+        if (err) throw err;
+        res
         .status(200)
-        .json({ data: 'metodo post' })
+        .json({ data: 'insertado correctamente' })
+         next
+       
+      });
+      
     })
 
     app.put('/', (req, res, next) => {
